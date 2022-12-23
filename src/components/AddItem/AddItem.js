@@ -1,40 +1,41 @@
-import { useState } from "react";
+import { Component } from "react";
 import { Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import useFormField from "../../common/useFieldsFunction";
 import { store } from "../../store";
 import { fetchAddItem } from "../../store/dispatches/itemAdd.dispatch";
 import styles from "./AddItem.module.scss";
 
-function AddItem({ updateItems }) {
-  const [mess, stateMess] = useState("");
-  const taskField = useFormField();
-  const addItemFunction = async (e) => {
+export default class AddItem extends Component {
+  state = { mess: "" };
+  addItemFunction = async (e) => {
     e.preventDefault();
-
-    const res = await store.dispatch(fetchAddItem(taskField.value));
+    const res = await store.dispatch(fetchAddItem(this.state.mess));
     if (res.type === "ITEM_ADD") {
-      updateItems(res.payload);
+      this.props.updateItems(true);
       return;
     }
-    stateMess(res.payload);
   };
-  return (
-    <>
-      {mess !== "" ? <p>{mess}</p> : null}
-      <Form className={styles.inputNewTask}>
-        <Form.Control type="text" placeholder="Нова задача" {...taskField} />
-
-        <Button
-          variant="outline-primary"
-          onClick={addItemFunction}
-          type="submit"
-        >
-          Додати задачу
-        </Button>
-      </Form>
-    </>
-  );
+  render() {
+    const task = this.state.mess;
+    console.log(task)
+    return (
+      <>
+        <Form className={styles.inputNewTask}>
+          <Form.Control
+            type="text"
+            placeholder="Нова задача"
+            value={task}
+            onChange={(e) => this.setState({ mess: e.target.value })}
+          />
+          <Button
+            variant="outline-primary"
+            onClick={this.addItemFunction}
+            type="submit"
+          >
+            Додати задачу
+          </Button>
+        </Form>
+      </>
+    );
+  }
 }
-
-export default AddItem;
